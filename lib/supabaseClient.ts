@@ -1,8 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 
-// IMPORTANT: Replace these with your own Supabase project details
-// You can find these in your Supabase Dashboard -> Project Settings -> API
-const SUPABASE_URL = 'https://skkwnahyqzkaqljdcxkp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNra3duYWh5cXprYXFsamRjeGtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwMDkzNzEsImV4cCI6MjA4NTU4NTM3MX0.qbIBwnE9Cu5QMkZNb1Rc5uqobBtetzW4k5_KsylpAgg';
+// Access environment variables using Vite's import.meta.env
+// Cast to any to avoid TypeScript error: Property 'env' does not exist on type 'ImportMeta'
+const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Debug log to check if env vars are loaded (visible in browser console)
+console.log('Supabase Config Status:', {
+  hasUrl: !!SUPABASE_URL,
+  hasKey: !!SUPABASE_ANON_KEY,
+  mode: (import.meta as any).env.MODE
+});
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Supabase configuration is missing. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment variables.');
+}
+
+// Fallback to empty strings to prevent crash on load, but requests will fail if env vars are missing
+export const supabase = createClient(
+  SUPABASE_URL || '', 
+  SUPABASE_ANON_KEY || ''
